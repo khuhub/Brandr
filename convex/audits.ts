@@ -67,3 +67,8 @@ export const getByCampaign = query({
       .first();
   },
 });
+
+export const createAudit = create;
+export const updateAuditStatus = updateStatus;
+export const getAudit = get;
+export const getAuditByCampaign = getByCampaign;

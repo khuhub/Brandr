@@ -48,5 +48,16 @@ export default defineSchema({
       audioSnippetUrl: v.optional(v.string()),
     }),
     recommendedAction: v.string(),
+    // Enrichment from scraper / extraction
+    visualSummary: v.optional(v.string()),
+    viewCount: v.optional(v.string()),
+    likeCount: v.optional(v.string()),
+    brandMentioned: v.optional(v.boolean()),
+    disclosureFound: v.optional(v.boolean()),
+    complianceStatus: v.optional(v.string()),
+    detectedKeywords: v.optional(v.array(v.string())),
+    detectedDisclosures: v.optional(v.array(v.string())),
+    potentialSponsoredContent: v.optional(v.boolean()),
+    aiReasoning: v.optional(v.string()),
   }).index("by_audit", ["auditId"]),
 });

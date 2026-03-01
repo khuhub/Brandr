@@ -21,6 +21,16 @@ export const create = mutation({
       audioSnippetUrl: v.optional(v.string()),
     }),
     recommendedAction: v.string(),
+    visualSummary: v.optional(v.string()),
+    viewCount: v.optional(v.string()),
+    likeCount: v.optional(v.string()),
+    brandMentioned: v.optional(v.boolean()),
+    disclosureFound: v.optional(v.boolean()),
+    complianceStatus: v.optional(v.string()),
+    detectedKeywords: v.optional(v.array(v.string())),
+    detectedDisclosures: v.optional(v.array(v.string())),
+    potentialSponsoredContent: v.optional(v.boolean()),
+    aiReasoning: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("auditFindings", args);
@@ -45,3 +55,7 @@ export const get = query({
     return await ctx.db.get(args.id);
   },
 });
+
+export const createFinding = create;
+export const getFindingsByAudit = getByAudit;
+export const getFinding = get;

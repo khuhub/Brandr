@@ -1,85 +1,14 @@
 "use node";
 
-// Scoring logic for audit findings
-// TODO (Person 2): Implement scoring algorithms
+// Helpers for recommended action and remediation email (scores come from Gemini).
 
-interface ScoringInput {
-  captionText: string;
-  transcriptText?: string;
-  brandDescription: string;
-  requiredDisclosureTokens: string[];
-  competitorKeywords: string[];
-  prohibitedClaimKeywords: string[];
+export interface ScoringFlags {
+  disclosureMissing: boolean;
+  competitorMention: string[];
+  prohibitedClaims: string[];
 }
 
-interface ScoringResult {
-  alignmentScore: number;
-  riskScore: number;
-  flags: {
-    disclosureMissing: boolean;
-    competitorMention: string[];
-    prohibitedClaims: string[];
-  };
-}
-
-// Calculate risk score based on rule violations
-export function calculateRiskScore(input: ScoringInput): ScoringResult {
-  const combinedText = `${input.captionText} ${input.transcriptText || ""}`.toLowerCase();
-
-  let riskScore = 0;
-  const flags = {
-    disclosureMissing: true,
-    competitorMention: [] as string[],
-    prohibitedClaims: [] as string[],
-  };
-
-  // Check for disclosure tokens
-  for (const token of input.requiredDisclosureTokens) {
-    if (combinedText.includes(token.toLowerCase())) {
-      flags.disclosureMissing = false;
-      break;
-    }
-  }
-  if (flags.disclosureMissing) {
-    riskScore += 40;
-  }
-
-  // Check for competitor mentions
-  for (const keyword of input.competitorKeywords) {
-    if (combinedText.includes(keyword.toLowerCase())) {
-      flags.competitorMention.push(keyword);
-    }
-  }
-  if (flags.competitorMention.length > 0) {
-    riskScore += 30;
-  }
-
-  // Check for prohibited claims
-  for (const keyword of input.prohibitedClaimKeywords) {
-    if (combinedText.includes(keyword.toLowerCase())) {
-      flags.prohibitedClaims.push(keyword);
-    }
-  }
-  if (flags.prohibitedClaims.length > 0) {
-    riskScore += 30;
-  }
-
-  // Cap at 100
-  riskScore = Math.min(riskScore, 100);
-
-  // TODO: Implement alignment score using Gemini embeddings
-  // For now, return a placeholder
-  const alignmentScore = 50;
-
-  return {
-    alignmentScore,
-    riskScore,
-    flags,
-  };
-}
-
-// Generate recommended action based on risk score
-export function generateRecommendedAction(riskScore: number, flags: ScoringResult["flags"]): string {
+export function generateRecommendedAction(riskScore: number, flags: ScoringFlags): string {
   if (riskScore >= 60) {
     const issues: string[] = [];
     if (flags.disclosureMissing) issues.push("missing disclosure");
@@ -93,12 +22,11 @@ export function generateRecommendedAction(riskScore: number, flags: ScoringResul
   return "No action needed. Content is compliant.";
 }
 
-// Generate remediation email draft
 export function generateRemediationEmail(
   creatorHandle: string,
   postUrl: string,
   brandName: string,
-  flags: ScoringResult["flags"]
+  flags: ScoringFlags
 ): string {
   const issues: string[] = [];
 

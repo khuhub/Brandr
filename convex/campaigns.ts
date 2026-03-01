@@ -34,3 +34,7 @@ export const list = query({
     return await ctx.db.query("campaigns").order("desc").collect();
   },
 });
+
+export const createCampaign = create;
+export const getCampaign = get;
+export const listCampaigns = list;
