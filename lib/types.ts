@@ -23,24 +23,27 @@ export interface Audit {
   };
 }
 
-export interface AuditFinding {
-  _id: string;
-  auditId: string;
-  creatorHandle: string;
+export interface PostFinding {
   postUrl: string;
   captionText: string;
-  transcriptText?: string;
-  alignmentScore: number;
+  transcriptText?: string | null;
   riskScore: number;
   flags: {
     disclosureMissing: boolean;
     competitorMention: string[];
     prohibitedClaims: string[];
   };
-  evidence: {
-    screenshots: string[];
-    audioSnippetUrl?: string;
-  };
+  viewCount?: string;
+  likeCount?: string;
+  brandMentioned?: boolean;
+  complianceStatus?: string;
+  detectedKeywords?: string[];
+}
+
+export interface CreatorFinding {
+  creatorHandle: string;
+  totalRiskScore: number;
+  posts: PostFinding[];
   recommendedAction: string;
 }
 
