@@ -10,6 +10,7 @@ export default defineSchema({
     prohibitedClaimKeywords: v.array(v.string()),
     creatorHandles: v.array(v.string()),
     createdAt: v.number(),
+    postsPerCreator: v.optional(v.number()),
   }),
 
   audits: defineTable({
@@ -60,4 +61,12 @@ export default defineSchema({
     potentialSponsoredContent: v.optional(v.boolean()),
     aiReasoning: v.optional(v.string()),
   }).index("by_audit", ["auditId"]),
+
+  suggestedCreators: defineTable({
+    campaignId: v.id("campaigns"),
+    username: v.string(),
+    followerCount: v.optional(v.string()),
+    matchPercent: v.number(),
+    matchLabel: v.string(),
+  }).index("by_campaign", ["campaignId"]),
 });
