@@ -53,7 +53,7 @@ export default function RootLayout({
 
   const appContent = showSidebar ? (
     <div className="min-h-screen bg-background flex">
-      <aside className="w-[220px] shrink-0 border-r bg-white flex flex-col h-screen sticky top-0">
+      <aside className="w-[220px] shrink-0 border-r bg-gradient-to-b from-white to-slate-50 flex flex-col h-screen sticky top-0 shadow-sm">
         <div className="px-5 py-5 border-b">
           <Link href="/" className="text-lg font-bold tracking-tight text-foreground">
             Brandr

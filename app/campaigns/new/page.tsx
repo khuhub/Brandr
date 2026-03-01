@@ -155,7 +155,7 @@ export default function CampaignSetupPage() {
       competitorKeywords: form.competitorKeywords,
       prohibitedClaimKeywords: form.prohibitedClaims,
       creatorHandles: form.creatorHandles,
-      createdAt: existingId ? Date.now() : Date.now(),
+      createdAt: Date.now(),
     };
 
     localStorage.setItem("brandr_campaign", JSON.stringify(campaign));
@@ -172,7 +172,7 @@ export default function CampaignSetupPage() {
     }
     localStorage.setItem("brandr_campaigns", JSON.stringify(history));
 
-    router.push("/dashboard");
+    router.push("/dashboard?autoRun=true");
   }
 
   return (

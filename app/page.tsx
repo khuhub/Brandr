@@ -25,7 +25,7 @@ function FloatingNav() {
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
         <Link href="/" className="flex items-baseline gap-2 text-foreground">
-          <span className="text-lg font-semibold tracking-tight">Brandr</span>
+          <span className="text-xl md:text-2xl font-semibold tracking-tight">Brandr</span>
           <span className="text-xs font-semibold text-foreground/70 hidden sm:inline">AI Creator Governance</span>
         </Link>
         <nav className="flex items-center gap-4">
@@ -77,7 +77,7 @@ const features = [
     visual: "dashboard" as const,
     title: "Creator Intelligence Dashboard",
     description:
-      "Brand alignment, risk scores, engagement quality, and trends for every creator — sortable by what matters most.",
+      "Run audits for your active campaign, then review each creator by risk level and total flagged issues in one dashboard.",
   },
   {
     handle: "@lifestyle.jake",
@@ -87,7 +87,7 @@ const features = [
     visual: "detail" as const,
     title: "Creator Detail View",
     description:
-      "Alignment breakdown, flagged posts, risk explanations, and tone comparison. Then decide: keep, monitor, or review.",
+      "Drill into post-level risk scores, disclosure gaps, competitor mentions, prohibited-claim flags, plus caption/transcript context with a recommended action for each creator.",
   },
   {
     handle: "@thecookingco",
@@ -97,7 +97,7 @@ const features = [
     visual: "discover" as const,
     title: "Discover New Creators",
     description:
-      "Find recommended creators with match scores, reasons why, and estimated ROI potential.",
+      "Discover net-new creators across the web who align highly with your brand, then review match scores and follower counts to prioritize outreach.",
   },
 ];
 
@@ -105,17 +105,17 @@ const steps = [
   {
     num: "01",
     title: "Define Your Campaign",
-    description: "Set brand guidelines, prohibited topics, required disclosures, and competitor list.",
+    description: "Add your brand context, creator handles, required disclosures, competitor keywords, and prohibited claims.",
   },
   {
     num: "02",
     title: "We Audit Creators",
-    description: "Our AI scans every post, screenshot, and transcript for brand safety signals.",
+    description: "Run an audit to score creators and surface low, medium, and high-risk profiles with issue counts.",
   },
   {
     num: "03",
     title: "Review & Act",
-    description: "Get a risk-scored dashboard and send remediation emails in one click.",
+    description: "Filter by risk, inspect flagged posts in detail, and use Discover to prioritize the best-fit creators.",
   },
 ];
 
@@ -263,7 +263,7 @@ function HowItWorksSection() {
             How it works
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            Three simple steps from campaign setup to actionable insights.
+            Set campaign rules, run audits, and review creators with risk and match visibility.
           </p>
         </FadeUp>
 
@@ -377,9 +377,13 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="#how-it-works"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-2"
               >
-                See how it works
+                <span>See how it works</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-4 h-4">
+                  <path d="M5 12h14" />
+                  <path d="M13 5l7 7-7 7" />
+                </svg>
               </Link>
             </div>
           </motion.div>
@@ -392,13 +396,12 @@ export default function LandingPage() {
 
         <div className="container relative mx-auto px-6">
           <FadeUp className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
-              Full visibility across your creator roster
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Monitor, evaluate, and discover creators — all from one
-              intelligent dashboard.
-            </p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+              Campaign setup, audit review, and creator discovery in one flow
+          </h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">
+              Configure campaign rules, audit creator risk, inspect flagged content, and rank creator fit from one workspace.
+          </p>
           </FadeUp>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

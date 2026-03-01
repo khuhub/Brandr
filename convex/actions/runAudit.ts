@@ -2,6 +2,7 @@
 
 import { action } from "../_generated/server";
 import { v } from "convex/values";
+import { Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
 import { calculateRiskScore, generateRecommendedAction, generateRemediationEmail } from "./scoring";
 
@@ -12,7 +13,7 @@ export const run = action({
   args: {
     campaignId: v.id("campaigns"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; auditId: Id<"audits"> }> => {
     // 1. Get campaign details
     const campaign = await ctx.runQuery(api.campaigns.get, { id: args.campaignId });
     if (!campaign) {
@@ -20,7 +21,7 @@ export const run = action({
     }
 
     // 2. Create audit record
-    const auditId = await ctx.runMutation(api.audits.create, {
+    const auditId: Id<"audits"> = await ctx.runMutation(api.audits.create, {
       campaignId: args.campaignId,
     });
 

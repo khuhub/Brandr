@@ -8,8 +8,7 @@ interface StoredCampaign extends Campaign {
   auditResults?: {
     creators: {
       handle: string;
-      alignment: number;
-      risk: "Low" | "Med" | "High";
+      risk: "Low" | "Medium" | "High";
     }[];
     completedAt: number;
   };
@@ -50,12 +49,11 @@ export default function PastCampaignsPage() {
   function getSimulatedResults(c: StoredCampaign) {
     if (c.auditResults) return c.auditResults;
     const rng = seededRandom(c._id);
-    const risks: ("Low" | "Med" | "High")[] = ["Low", "Med", "High"];
+    const risks: ("Low" | "Medium" | "High")[] = ["Low", "Medium", "High"];
     return {
       creators: c.creatorHandles.map((handle) => ({
         handle,
-        alignment: Math.floor(60 + rng() * 35),
-        risk: risks[Math.floor(rng() * 2.3)] as "Low" | "Med" | "High",
+        risk: risks[Math.floor(rng() * 2.3)] as "Low" | "Medium" | "High",
       })),
       completedAt: c.createdAt + 4000,
     };
@@ -101,10 +99,7 @@ export default function PastCampaignsPage() {
           {campaigns.map((c) => {
             const isOpen = expanded === c._id;
             const results = getSimulatedResults(c);
-            const avgAlignment = Math.round(
-              results.creators.reduce((sum, cr) => sum + cr.alignment, 0) / results.creators.length
-            );
-            const highRiskCount = results.creators.filter((cr) => cr.risk === "High" || cr.risk === "Med").length;
+            const highRiskCount = results.creators.filter((cr) => cr.risk === "High" || cr.risk === "Medium").length;
 
             return (
               <div key={c._id} className="rounded-lg border bg-white overflow-hidden">
@@ -123,9 +118,41 @@ export default function PastCampaignsPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-4 text-xs">
-                        <span className="text-muted-foreground">Avg alignment <span className="font-semibold text-foreground">{avgAlignment}%</span></span>
                         <span className="text-muted-foreground">Flagged <span className="font-semibold text-amber-600">{highRiskCount}</span></span>
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!confirm(`Delete campaign "${c.brandName}"? This cannot be undone.`)) return;
+                          const stored = localStorage.getItem("brandr_campaigns");
+                          if (!stored) return;
+                          try {
+                            const arr: StoredCampaign[] = JSON.parse(stored);
+                            const next = arr.filter((x) => x._id !== c._id);
+                            localStorage.setItem("brandr_campaigns", JSON.stringify(next));
+                            setCampaigns(next);
+                            // if this was the active campaign, remove it
+                            const active = localStorage.getItem("brandr_campaign");
+                            if (active) {
+                              try {
+                                const ac = JSON.parse(active);
+                                if (ac._id === c._id) localStorage.removeItem("brandr_campaign");
+                              } catch {}
+                            }
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        aria-label={`Delete ${c.brandName}`}
+                        className="text-muted-foreground hover:text-rose-600 p-1 rounded transition-colors"
+                        title="Delete campaign"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                          <path d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                        </svg>
+                      </button>
                       <svg
                         width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                         className={`text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -142,14 +169,10 @@ export default function PastCampaignsPage() {
                       <p className="text-xs text-muted-foreground mt-3 mb-3">{c.brandDescription}</p>
                     )}
 
-                    <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
                       <div className="rounded-lg bg-gray-50 p-3 text-center">
                         <p className="text-2xl font-bold text-foreground">{c.creatorHandles.length}</p>
                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">Creators</p>
-                      </div>
-                      <div className="rounded-lg bg-gray-50 p-3 text-center">
-                        <p className="text-2xl font-bold text-foreground">{avgAlignment}%</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">Avg Alignment</p>
                       </div>
                       <div className="rounded-lg bg-gray-50 p-3 text-center">
                         <p className="text-2xl font-bold text-amber-600">{highRiskCount}</p>
@@ -162,7 +185,6 @@ export default function PastCampaignsPage() {
                         <thead>
                           <tr className="border-b bg-gray-50/50">
                             <th className="text-left px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Creator</th>
-                            <th className="text-left px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Alignment</th>
                             <th className="text-left px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Risk</th>
                           </tr>
                         </thead>
@@ -170,14 +192,13 @@ export default function PastCampaignsPage() {
                           {results.creators.map((cr) => (
                             <tr key={cr.handle} className="border-b last:border-b-0">
                               <td className="px-3 py-2 text-xs font-medium text-foreground">@{cr.handle}</td>
-                              <td className="px-3 py-2 text-xs tabular-nums">{cr.alignment}%</td>
                               <td className="px-3 py-2">
                                 <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                                   cr.risk === "Low"
                                     ? "bg-emerald-100 text-emerald-700"
-                                    : cr.risk === "Med"
+                                    : cr.risk === "Medium"
                                     ? "bg-amber-100 text-amber-700"
-                                    : "bg-red-100 text-red-700"
+                                    : "bg-rose-100 text-rose-700"
                                 }`}>
                                   {cr.risk}
                                 </span>
