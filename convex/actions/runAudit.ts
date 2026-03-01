@@ -2,6 +2,7 @@
 
 import { action } from "../_generated/server";
 import { v } from "convex/values";
+import { Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
 import { generateRecommendedAction } from "./scoring";
 
@@ -12,7 +13,7 @@ export const run = action({
   args: {
     campaignId: v.id("campaigns"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; auditId: Id<"audits"> }> => {
     // 1. Get campaign details
     const campaign = await ctx.runQuery(api.campaigns.get, { id: args.campaignId });
     if (!campaign) {

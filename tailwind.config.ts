@@ -45,6 +45,16 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        "pulse-line": {
+          "0%": { strokeOpacity: "0.15" },
+          "50%": { strokeOpacity: "0.4" },
+          "100%": { strokeOpacity: "0.15" },
+        },
+      },
+      animation: {
+        "pulse-line": "pulse-line 3s ease-in-out infinite",
+      },
     },
   },
   plugins: [],

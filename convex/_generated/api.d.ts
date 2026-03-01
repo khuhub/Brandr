@@ -8,7 +8,6 @@
  * @module
  */
 
-import type * as actions_email from "../actions/email.js";
 import type * as actions_gemini from "../actions/gemini.js";
 import type * as actions_runAudit from "../actions/runAudit.js";
 import type * as actions_scoring from "../actions/scoring.js";
@@ -23,7 +22,6 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  "actions/email": typeof actions_email;
   "actions/gemini": typeof actions_gemini;
   "actions/runAudit": typeof actions_runAudit;
   "actions/scoring": typeof actions_scoring;
