@@ -4,7 +4,7 @@ import { action } from "../_generated/server";
 import { v } from "convex/values";
 import { Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
-import { calculateRiskScore, generateRecommendedAction, generateRemediationEmail } from "./scoring";
+import { generateRecommendedAction } from "./scoring";
 
 // Main orchestrator action that runs the audit
 // TODO (Person 2 + Person 3): Complete Daytona integration
@@ -20,57 +20,69 @@ export const run = action({
       throw new Error("Campaign not found");
     }
 
-    // 2. Create audit record
-    const auditId: Id<"audits"> = await ctx.runMutation(api.audits.create, {
+    const auditId = await ctx.runMutation(api.audits.create, {
       campaignId: args.campaignId,
     });
 
-    // 3. Update status to running
     await ctx.runMutation(api.audits.updateStatus, {
       auditId,
       status: "running",
     });
 
     try {
-      // 4. Call Daytona to scrape TikTok profiles
-      // TODO (Person 3): Replace with actual Daytona API call
       const scrapedData = await callDaytona(campaign.creatorHandles);
-
       let flaggedCreators = 0;
 
-      // 5. Process each creator's posts
       for (const creator of scrapedData) {
         for (const post of creator.posts) {
-          // Calculate scores
-          const scoring = calculateRiskScore({
+          const { alignmentScore } = await ctx.runAction(api.actions.gemini.scoreAlignment, {
+            brandDescription: campaign.brandDescription,
             captionText: post.captionText,
             transcriptText: post.transcriptText,
-            brandDescription: campaign.brandDescription,
+            visualSummary: post.visualSummary,
+            aiReasoning: post.aiReasoning,
+          });
+
+          const { riskScore, flags } = await ctx.runAction(api.actions.gemini.scoreRisk, {
+            captionText: post.captionText,
+            transcriptText: post.transcriptText,
             requiredDisclosureTokens: campaign.requiredDisclosureTokens,
             competitorKeywords: campaign.competitorKeywords,
             prohibitedClaimKeywords: campaign.prohibitedClaimKeywords,
+            screenshotBase64: post.screenshots?.[0],
+            visualSummary: post.visualSummary,
+            aiReasoning: post.aiReasoning,
           });
 
-          const recommendedAction = generateRecommendedAction(scoring.riskScore, scoring.flags);
+          const recommendedAction = generateRecommendedAction(riskScore, flags);
 
-          // Store finding
           await ctx.runMutation(api.findings.create, {
             auditId,
             creatorHandle: creator.creatorHandle,
             postUrl: post.postUrl,
             captionText: post.captionText,
             transcriptText: post.transcriptText,
-            alignmentScore: scoring.alignmentScore,
-            riskScore: scoring.riskScore,
-            flags: scoring.flags,
+            alignmentScore,
+            riskScore,
+            flags,
             evidence: {
-              screenshots: post.screenshots,
+              screenshots: post.screenshots ?? [],
               audioSnippetUrl: post.audioSnippetUrl,
             },
             recommendedAction,
+            visualSummary: post.visualSummary,
+            viewCount: post.viewCount,
+            likeCount: post.likeCount,
+            brandMentioned: post.brandMentioned,
+            disclosureFound: post.disclosureFound,
+            complianceStatus: post.complianceStatus,
+            detectedKeywords: post.detectedKeywords,
+            detectedDisclosures: post.detectedDisclosures,
+            potentialSponsoredContent: post.potentialSponsoredContent,
+            aiReasoning: post.aiReasoning,
           });
 
-          if (scoring.riskScore >= 60) {
+          if (riskScore >= 60) {
             flaggedCreators++;
           }
         }
@@ -98,19 +110,34 @@ export const run = action({
   },
 });
 
-// Placeholder for Daytona API call
-// TODO (Person 3): Implement actual Daytona integration
+// Matches scraper extraction output (Daytona / Browser Use)
 interface DaytonaPost {
   postUrl: string;
   captionText: string;
   transcriptText?: string;
-  screenshots: string[];
+  screenshots?: string[];
   audioSnippetUrl?: string;
+  visualSummary?: string;
+  viewCount?: string;
+  likeCount?: string;
+  brandMentioned?: boolean;
+  disclosureFound?: boolean;
+  complianceStatus?: string;
+  detectedKeywords?: string[];
+  detectedDisclosures?: string[];
+  potentialSponsoredContent?: boolean;
+  aiReasoning?: string;
 }
 
 interface DaytonaCreatorResult {
   creatorHandle: string;
   posts: DaytonaPost[];
+  summary?: {
+    totalPosts: number;
+    violations: number;
+    compliant: number;
+    notBrandRelated: number;
+  };
 }
 
 async function callDaytona(creatorHandles: string[]): Promise<DaytonaCreatorResult[]> {
@@ -131,6 +158,16 @@ async function callDaytona(creatorHandles: string[]): Promise<DaytonaCreatorResu
           transcriptText: "Hey guys, I've been using this product for a week and it's incredible",
           screenshots: [],
           audioSnippetUrl: undefined,
+          visualSummary: undefined,
+          viewCount: undefined,
+          likeCount: undefined,
+          brandMentioned: undefined,
+          disclosureFound: undefined,
+          complianceStatus: undefined,
+          detectedKeywords: undefined,
+          detectedDisclosures: undefined,
+          potentialSponsoredContent: undefined,
+          aiReasoning: undefined,
         },
       ],
     }));
@@ -152,3 +189,5 @@ async function callDaytona(creatorHandles: string[]): Promise<DaytonaCreatorResu
 
   return response.json();
 }
+
+export const runAudit = run;

@@ -10,6 +10,7 @@ export const create = mutation({
     competitorKeywords: v.array(v.string()),
     prohibitedClaimKeywords: v.array(v.string()),
     creatorHandles: v.array(v.string()),
+    postsPerCreator: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const campaignId = await ctx.db.insert("campaigns", {
@@ -34,3 +35,7 @@ export const list = query({
     return await ctx.db.query("campaigns").order("desc").collect();
   },
 });
+
+export const createCampaign = create;
+export const getCampaign = get;
+export const listCampaigns = list;
