@@ -158,10 +158,69 @@ brandr/
       "captionText": "...",
       "transcriptText": "..." | null,
       "screenshots": ["base64...", "base64..."],
+      "isBrandRelated": true | false,
       "audioSnippetUrl": "..." | null
     }
   ]
 }
+```
+
+---
+
+## Scraper Architecture (Optimized)
+
+### Single-Pass Parallel Workers
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│            3 PARALLEL WORKERS (Single Browser Session)           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Worker 0 (Post #1)    Worker 1 (Post #2)    Worker 2 (Post #3) │
+│  ┌────────────────┐    ┌────────────────┐    ┌────────────────┐ │
+│  │ 1. Open post   │    │ 1. Open post   │    │ 1. Open post   │ │
+│  │ 2. Get caption │    │ 2. Get caption │    │ 2. Get caption │ │
+│  │ 3. Brand check │    │ 3. Brand check │    │ 3. Brand check │ │
+│  │    ↓ YES       │    │    ↓ NO        │    │    ↓ YES       │ │
+│  │ 4. Screenshot  │    │ 4. Return      │    │ 4. Screenshot  │ │
+│  │ 5. Record 10s  │    │                │    │ 5. Record 10s  │ │
+│  │ 6. Transcribe  │    │                │    │ 6. Transcribe  │ │
+│  │ 7. Return all  │    │                │    │ 7. Return all  │ │
+│  └────────────────┘    └────────────────┘    └────────────────┘ │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Key Design Decisions
+
+| Feature | Benefit |
+|---------|---------|
+| **Parallel workers** | 3x faster than sequential |
+| **Single browser session** | No re-opening for full analysis |
+| **Selective screenshots** | Only for brand-related posts |
+| **Selective audio** | Only record/transcribe when needed |
+| **Video recording** | Built into browser, extract audio with ffmpeg |
+
+### Flow per Worker
+
+1. Open browser with video recording enabled
+2. Navigate to profile → click on assigned post
+3. Extract caption text (use_vision=False for speed)
+4. **Brand check**: Does caption contain brand keywords?
+5. **If YES**: Take 2 screenshots, wait 10s for audio
+6. **If NO**: Skip screenshots/audio, return immediately
+7. Close browser (saves video file)
+8. If brand-related: Extract audio with ffmpeg → transcribe with Gemini
+
+### Usage
+
+```bash
+# Basic usage
+python tiktok-scraper.py @charlidamelio --brand Nike --keywords nike "just do it"
+
+# Environment variables needed
+export BROWSER_USE_API_KEY="..."
+export GOOGLE_API_KEY="..."  # For transcription
 ```
 
 ---
@@ -188,13 +247,13 @@ NEXT_PUBLIC_CONVEX_URL=<your-convex-url>
 ### `.env` (Shared)
 ```
 GOOGLE_API_KEY=<gemini-api-key>
-DAYTONA_API_KEY=<daytona-api-key>
+BROWSER_USE_API_KEY=<browser-use-api-key>
 ```
 
 ### Convex Dashboard (set in Convex dashboard)
 ```
 GOOGLE_API_KEY=<gemini-api-key>
-DAYTONA_API_KEY=<daytona-api-key>
+BROWSER_USE_API_KEY=<browser-use-api-key>
 ```
 
 ---
