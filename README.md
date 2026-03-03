@@ -11,8 +11,8 @@ Influencer compliance auditing for brands that work with creators.
 <p align="center">
   <img src="https://github.com/user-attachments/assets/adba2c0c-5552-477a-82bd-027af0f5194b" width="320"/>
   <img src="https://github.com/user-attachments/assets/24f34bc2-73ee-4987-ad64-6b358b31d5b3" width="320"/>
-  <img src="https://github.com/user-attachments/assets/0f6ce557-cd84-4a0f-877a-34884f62d669" width="320"/>
   <img src="https://github.com/user-attachments/assets/de636064-dcba-4991-8c3b-ca90b2c31549" width="320"/>
+  <img src="https://github.com/user-attachments/assets/0f6ce557-cd84-4a0f-877a-34884f62d669" width="320"/>
   <img src="https://github.com/user-attachments/assets/4aff2496-69b9-4769-8db9-cd65b135ae7c" width="320"/>
   <img src="https://github.com/user-attachments/assets/3b9c9b9f-9d5a-4b9e-bbb8-3ee48bf4f35c" width="320"/>
 </p>
