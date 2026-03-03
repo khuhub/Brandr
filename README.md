@@ -3,13 +3,20 @@
 Influencer compliance auditing for brands that work with creators.
 
 <p>
-  <img src="https://github.com/user-attachments/assets/adba2c0c-5552-477a-82bd-027af0f5194b" width="400" alt="intro" />
-  <img src="https://github.com/user-attachments/assets/de636064-dcba-4991-8c3b-ca90b2c31549" width="400" alt="audits" />
+  <a href="https://www.youtube.com/watch?v=8i9XGeD703Y" target="_blank">
+    Demo
+  </a>
 </p>
-<p>
-  <img src="https://github.com/user-attachments/assets/a73b7bff-2b9b-4a5f-b168-6f368627e34f" width="400" alt="influencers" />
-  <img src="https://github.com/user-attachments/assets/0f6ce557-cd84-4a0f-877a-34884f62d669" width="400" alt="newcreators" />
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/adba2c0c-5552-477a-82bd-027af0f5194b" width="320"/>
+  <img src="https://github.com/user-attachments/assets/24f34bc2-73ee-4987-ad64-6b358b31d5b3" width="320"/>
+  <img src="https://github.com/user-attachments/assets/0f6ce557-cd84-4a0f-877a-34884f62d669" width="320"/>
+  <img src="https://github.com/user-attachments/assets/de636064-dcba-4991-8c3b-ca90b2c31549" width="320"/>
+  <img src="https://github.com/user-attachments/assets/4aff2496-69b9-4769-8db9-cd65b135ae7c" width="320"/>
+  <img src="https://github.com/user-attachments/assets/3b9c9b9f-9d5a-4b9e-bbb8-3ee48bf4f35c" width="320"/>
 </p>
+
 
 ## The Problem
 
@@ -24,7 +31,7 @@ Right now, someone on your team has to manually watch every post, read every cap
 3. Brandr scrapes their content, analyzes it with AI, and scores each post
 4. Dashboard with flags, scores, and remediation suggestions
 
-## The Web Agents
+## The Web Agents (Via Browser Use Cloud)
 
 This is where it gets interesting. We built AI-powered browser agents that navigate TikTok like a human would.
 
